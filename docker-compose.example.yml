@@ -1,0 +1,50 @@
+# SRS Webhook Fix - Example Docker Compose
+# Clean, minimal setup with just SRS + webhook example
+version: '3.8'
+
+services:
+  # SRS with webhook support (the main solution)
+  srs:
+    build:
+      context: .
+      dockerfile: Dockerfile.srs-optimized
+    container_name: srs-webhook-fix
+    ports:
+      - "2935:1935"   # RTMP ingest (stream to rtmp://localhost:2935/live/test)
+      - "8080:8080"   # SRS admin console (http://localhost:8080)
+      - "1985:1985"   # SRS HTTP API
+    environment:
+      # Set this to YOUR webhook endpoint
+      - SRS_CALLBACK_URL=http://webhook-example:3000/srs/webhook
+    restart: unless-stopped
+
+  # Simple webhook example (replace with your application)
+  webhook-example:
+    image: node:18-alpine
+    container_name: webhook-example
+    ports:
+      - "3000:3000"   # Webhook endpoint
+    working_dir: /app
+    command: |
+      sh -c "
+        echo 'const express = require(\"express\");
+        const app = express();
+        app.use(express.json());
+
+        app.post(\"/srs/webhook\", (req, res) => {
+          console.log(\"🎉 SRS WEBHOOK RECEIVED:\", JSON.stringify(req.body, null, 2));
+          res.json({ code: 0 });
+        });
+
+        app.listen(3000, () => {
+          console.log(\"📡 Webhook server listening on port 3000\");
+          console.log(\"📺 Stream to: rtmp://localhost:2935/live/test\");
+        });' > server.js &&
+        npm init -y &&
+        npm install express &&
+        node server.js
+      "
+    restart: unless-stopped
+
+# Optional: Add your own application service here
+# Replace 'webhook-example' with your actual API service

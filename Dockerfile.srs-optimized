@@ -1,0 +1,29 @@
+# Optimized SRS 6.0 with Python config generation - Production Ready
+FROM ossrs/srs:6
+
+# Install Python and dependencies efficiently
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create Python environment and install Jinja2
+RUN python3 -m venv /opt/srs-config/venv && \
+    /opt/srs-config/venv/bin/pip install --no-cache-dir jinja2
+
+# Copy our config generation system
+COPY srs-custom-config/ /opt/srs-config/
+
+# Make startup script executable
+RUN chmod +x /opt/srs-config/gen_conf_and_run.sh
+
+# Update script to use pre-installed environment and correct paths
+RUN sed -i 's|config_generator_home=/tmp/srs-config|config_generator_home=/opt/srs-config|' /opt/srs-config/gen_conf_and_run.sh && \
+    sed -i 's|python3 -m venv venv|echo "Using pre-installed venv"|' /opt/srs-config/gen_conf_and_run.sh && \
+    sed -i 's|source venv/bin/activate|source /opt/srs-config/venv/bin/activate|g' /opt/srs-config/gen_conf_and_run.sh
+
+# Default webhook URL (can be overridden)
+ENV SRS_CALLBACK_URL=http://conference-translation-api:3000/webhook/srs/publish
+
+# Use our optimized startup script
+CMD ["/opt/srs-config/gen_conf_and_run.sh"]
