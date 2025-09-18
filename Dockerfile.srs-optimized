@@ -23,7 +23,7 @@ RUN sed -i 's|config_generator_home=/tmp/srs-config|config_generator_home=/opt/s
     sed -i 's|source venv/bin/activate|source /opt/srs-config/venv/bin/activate|g' /opt/srs-config/gen_conf_and_run.sh
 
 # Default webhook URL (can be overridden)
-ENV SRS_CALLBACK_URL=http://conference-translation-api:3000/webhook/srs/publish
+ENV SRS_CALLBACK_URL=http://webhook-example:3000/srs/webhook
 
 # Use our optimized startup script
 CMD ["/opt/srs-config/gen_conf_and_run.sh"]
