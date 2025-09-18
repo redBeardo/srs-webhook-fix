@@ -78,17 +78,15 @@ srs-webhook-fix/
 ├── README.md                      # This guide
 ├── PROBLEM.md                     # Detailed problem analysis
 ├── Dockerfile.srs-optimized       # Production-ready SRS image
-├── docker-compose.example.yml     # Example configuration
-├── srs-custom-config/             # Python config generation
+├── docker-compose.example.yml     # Complete working example
+├── srs-custom-config/             # Python config generation system
 │   ├── gen_conf/
 │   │   ├── gen_conf.py           # Core Python script
-│   │   └── venv/                 # Pre-installed environment
+│   │   └── venv/                 # Pre-installed Python environment
 │   ├── templates/
-│   │   └── srs.conf.j2          # Jinja2 template
-│   └── gen_conf_and_run.sh      # Startup script
-└── examples/
-    ├── basic-webhook/            # Minimal webhook example
-    └── production-setup/         # Full production deployment
+│   │   └── srs.conf.j2          # Jinja2 configuration template
+│   └── gen_conf_and_run.sh      # Container startup script
+└── .gitignore                     # Excludes generated configs
 ```
 
 ## 🔧 How It Works
